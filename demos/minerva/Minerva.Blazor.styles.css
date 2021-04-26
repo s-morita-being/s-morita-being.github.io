@@ -1,0 +1,19 @@
+/* /Pages/Index.razor.rz.scp.css */
+.sticky[b-u3xg272vmc] {
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+    background-color: white;
+}
+/* /Shared/SekkeishoView.razor.rz.scp.css */
+.source[b-r0w85yc3zf] {
+    white-space: pre-wrap;
+}
+.small[b-r0w85yc3zf] {
+    font-size: small;
+}
+.sticky[b-r0w85yc3zf] {
+    position: sticky;
+    top: 2.25em;
+    background-color: white;
+}
