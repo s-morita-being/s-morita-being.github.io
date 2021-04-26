@@ -9,6 +9,26 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="Minerva.Blazor.styles.css" rel="stylesheet" />
+    <script>
+        function loadGAPI() {
+            gapi.load('client:auth2:picker', async () => {
+                await gapi.client.init({
+                    clientId: '707865395504-upvimkaliqvll844a2562l4m8j451cn2.apps.googleusercontent.com',
+                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                    scope: 'https://www.googleapis.com/auth/drive.file'
+                });
+                window.findGoogleDriveFile = async (name) => {
+                    var result = await gapi.client.drive.files.list({
+                        spaces: 'drive',
+                        q: `name = '${name}'`,
+                        fields: 'files(id)'
+                    });
+                    return result.files[0].id;
+                };
+            });
+        }
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="loadGAPI()"></script>
 </head>
 
 <body>
