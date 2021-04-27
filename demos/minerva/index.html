@@ -15,7 +15,7 @@
                 await gapi.client.init({
                     clientId: '707865395504-upvimkaliqvll844a2562l4m8j451cn2.apps.googleusercontent.com',
                     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-                    scope: 'https://www.googleapis.com/auth/drive.file'
+                    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install'
                 });
                 const auth = gapi.auth2.getAuthInstance();
                 window.getAccessToken = () => auth.currentUser.get().getAuthResponse(true).access_token;
