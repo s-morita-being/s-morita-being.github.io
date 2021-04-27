@@ -17,14 +17,30 @@
                     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
                     scope: 'https://www.googleapis.com/auth/drive.file'
                 });
-                window.findGoogleDriveFile = async (name) => {
-                    var result = await gapi.client.drive.files.list({
-                        spaces: 'drive',
-                        q: `name = '${name}'`,
-                        fields: 'files(id)'
-                    });
-                    return result.files[0].id;
-                };
+                async function openPicker(build) {
+                    const auth = gapi.auth2.getAuthInstance();
+                    if (!auth.isSignedIn.get()) await auth.signIn();
+                    build(new google.picker.PickerBuilder()
+                        .setAppId('707865395504')
+                        .setOAuthToken(auth.currentUser.get().getAuthResponse(true).access_token)
+                        .setLocale('ja')
+                    ).build().setVisible(true);
+                }
+                window.pickGoogleDriveFile = () => new Promise(async (resolve, reject) => await openPicker(builder => builder
+                    .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
+                        .setIncludeFolders(true)
+                    )
+                    .setCallback(async data => {
+                        switch (data[google.picker.Response.ACTION]) {
+                            case google.picker.Action.CANCEL:
+                                resolve(null);
+                                break;
+                            case google.picker.Action.PICKED:
+                                resolve(data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID]);
+                                break;
+                        }
+                    })
+                ));
             });
         }
     </script>
