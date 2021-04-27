@@ -38,7 +38,7 @@
                             case google.picker.Action.PICKED:
                                 resolve([
                                     data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID],
-                                    auth.currentUser.get().getAuthResponse(true).access_token
+                                    gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token
                                 ]);
                                 break;
                         }
