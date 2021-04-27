@@ -17,12 +17,13 @@
                     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
                     scope: 'https://www.googleapis.com/auth/drive.file'
                 });
+                const auth = gapi.auth2.getAuthInstance();
+                window.getAccessToken = () => auth.currentUser.get().getAuthResponse(true).access_token;
                 async function openPicker(build) {
-                    const auth = gapi.auth2.getAuthInstance();
                     if (!auth.isSignedIn.get()) await auth.signIn();
                     build(new google.picker.PickerBuilder()
                         .setAppId('707865395504')
-                        .setOAuthToken(auth.currentUser.get().getAuthResponse(true).access_token)
+                        .setOAuthToken(getAccessToken())
                         .setLocale('ja')
                     ).build().setVisible(true);
                 }
@@ -30,17 +31,13 @@
                     .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
                         .setIncludeFolders(true)
                     )
-                    .setCallback(async data => {
+                    .setCallback(data => {
                         switch (data[google.picker.Response.ACTION]) {
                             case google.picker.Action.CANCEL:
                                 resolve(null);
                                 break;
                             case google.picker.Action.PICKED:
-                                const response = await gapi.client.drive.files.get({
-                                    fileId: data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID],
-                                    fields: 'webContentLink'
-                                });
-                                resolve(response.result.webContentLink);
+                                resolve(`https://www.googleapis.com/drive/v3/files/${data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID]}?alt=media`);
                                 break;
                         }
                     })
