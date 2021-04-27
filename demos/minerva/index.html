@@ -26,7 +26,7 @@
                         .setLocale('ja')
                     ).build().setVisible(true);
                 }
-                window.pickGoogleDriveFile = () => new Promise(async (resolve, reject) => await openPicker(builder => builder
+                window.pickFile = () => new Promise(async (resolve, reject) => await openPicker(builder => builder
                     .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
                         .setIncludeFolders(true)
                     )
@@ -36,10 +36,11 @@
                                 resolve(null);
                                 break;
                             case google.picker.Action.PICKED:
-                                resolve([
-                                    data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID],
-                                    gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token
-                                ]);
+                                const response = await gapi.client.drive.files.get({
+                                    fileId: data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID],
+                                    fields: 'webContentLink'
+                                });
+                                resolve(response.result.webContentLink);
                                 break;
                         }
                     })
