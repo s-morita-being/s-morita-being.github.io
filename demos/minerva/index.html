@@ -10,29 +10,30 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="Minerva.Blazor.styles.css" rel="stylesheet" />
     <script>
-        /*
-        window.getAccessToken = () => null;
-        window.parseState = () => {
-            const state = new URLSearchParams(location.search).get('state');
-            if (!state) return null;
-            const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
-            return [action, action === 'open' ? ids[0] : folderId];
-        };
-        window.openFile = () => new Promise(async resolve => {
-            const url = prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho');
-            resolve(url ? `?state=${encodeURIComponent(JSON.stringify({
-                action: 'open',
-                ids: [url]
-            }))}` : null);
-        });
-        window.pickFile = () => new Promise(async (resolve, reject) => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/kuiko.sekkeisho')));
-        */
-        window.parseState = () => {
-            const state = new URLSearchParams(location.search).get('state');
-            if (!state) return null;
-            const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
-            return [action, action === 'open' ? `https://www.googleapis.com/drive/v3/files/${ids[0]}?alt=media` : folderId];
-        };
+        let resolveGAPI;
+        const GAPI = new Promise(resolve => resolveGAPI = resolve);
+        window.parseState = async () => (await GAPI).parseState();
+        window.getAccessToken = async () => (await GAPI).getAccessToken();
+        window.openFile = async () => (await GAPI).openFile();
+        window.pickFile = async () => (await GAPI).pickFile();
+        window.pickFolder = async () => (await GAPI).pickFolder();
+        /*resolveGAPI({
+            parseState: () => {
+                const state = new URLSearchParams(location.search).get('state');
+                if (!state) return null;
+                const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
+                return [action, action === 'open' ? ids[0] : folderId];
+            },
+            getAccessToken: () => null,
+            openFile: () => new Promise(async resolve => {
+                const url = prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho');
+                resolve(url ? `?state=${encodeURIComponent(JSON.stringify({
+                    action: 'open',
+                    ids: [url]
+                }))}` : null);
+            }),
+            pickFile: () => new Promise(async resolve => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/kuiko.sekkeisho')))
+        });*/
         function loadGAPI() {
             gapi.load('client:auth2:picker', async () => {
                 await gapi.client.init({
@@ -41,19 +42,12 @@
                     scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install'
                 });
                 const auth = gapi.auth2.getAuthInstance();
-                window.getAccessToken = () => auth.currentUser.get().getAuthResponse(true).access_token;
-                async function openPicker(build) {
-                    if (!auth.isSignedIn.get()) await auth.signIn();
-                    build(new google.picker.PickerBuilder()
-                        .setAppId('707865395504')
-                        .setOAuthToken(getAccessToken())
-                        .setLocale('ja')
-                    ).build().setVisible(true);
-                }
-                const pickFile = f => new Promise(async (resolve, reject) => await openPicker(builder => builder
-                    .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
-                        .setIncludeFolders(true)
-                    )
+                if (!auth.isSignedIn.get()) await auth.signIn();
+                const openPicker = (view, f) => new Promise(resolve => new google.picker.PickerBuilder()
+                    .setAppId('707865395504')
+                    .setOAuthToken(getAccessToken())
+                    .setLocale('ja')
+                    .addView(view)
                     .setCallback(data => {
                         switch (data[google.picker.Response.ACTION]) {
                             case google.picker.Action.CANCEL:
@@ -64,12 +58,29 @@
                                 break;
                         }
                     })
-                ));
-                window.openFile = () => pickFile(id => `?state=${encodeURIComponent(JSON.stringify({
-                    action: 'open',
-                    ids: [id]
-                }))}`);
-                window.pickFile = () => pickFile(id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media`);
+                    .build().setVisible(true)
+                );
+                resolveGAPI({
+                    parseState: () => {
+                        const state = new URLSearchParams(location.search).get('state');
+                        if (!state) return null;
+                        const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
+                        return [action, action === 'open' ? `https://www.googleapis.com/drive/v3/files/${ids[0]}?alt=media` : folderId];
+                    },
+                    getAccessToken: () => auth.currentUser.get().getAuthResponse(true).access_token,
+                    openFile: () => openPicker(
+                        new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true),
+                        id => `?state=${encodeURIComponent(JSON.stringify({action: 'open', ids: [id]}))}`
+                    ),
+                    pickFile: () => openPicker(
+                        new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true),
+                        id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media`
+                    ),
+                    pickFolder: () => openPicker(
+                        new google.picker.DocsView(google.picker.ViewId.FOLDERS).setSelectFolderEnabled(true),
+                        id => id
+                    )
+                });
             });
         }
     </script>
