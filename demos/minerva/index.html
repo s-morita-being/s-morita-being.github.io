@@ -10,6 +10,7 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="Minerva.Blazor.styles.css" rel="stylesheet" />
     <script>
+        /*
         window.getAccessToken = () => null;
         window.parseState = () => {
             const state = new URLSearchParams(location.search).get('state');
@@ -25,6 +26,13 @@
             }))}` : null);
         });
         window.pickFile = () => new Promise(async (resolve, reject) => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/kuiko.sekkeisho')));
+        */
+        window.parseState = () => {
+            const state = new URLSearchParams(location.search).get('state');
+            if (!state) return null;
+            const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
+            return [action, action === 'open' ? `https://www.googleapis.com/drive/v3/files/${ids[0]}?alt=media` : folderId];
+        };
         function loadGAPI() {
             gapi.load('client:auth2:picker', async () => {
                 await gapi.client.init({
@@ -34,12 +42,6 @@
                 });
                 const auth = gapi.auth2.getAuthInstance();
                 window.getAccessToken = () => auth.currentUser.get().getAuthResponse(true).access_token;
-                window.parseState = () => {
-                    const state = new URLSearchParams(location.search).get('state');
-                    if (!state) return null;
-                    const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
-                    return [action, action === 'open' ? `https://www.googleapis.com/drive/v3/files/${ids[0]}?alt=media` : folderId];
-                };
                 async function openPicker(build) {
                     if (!auth.isSignedIn.get()) await auth.signIn();
                     build(new google.picker.PickerBuilder()
