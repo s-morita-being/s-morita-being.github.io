@@ -41,11 +41,14 @@
                     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
                     scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install'
                 });
-                const auth = gapi.auth2.getAuthInstance();
-                if (!auth.isSignedIn.get()) await auth.signIn();
-                const openPicker = (view, f) => new Promise(resolve => new google.picker.PickerBuilder()
+                const getAccessToken = async () => {
+                    const auth = gapi.auth2.getAuthInstance();
+                    if (!auth.isSignedIn.get()) await auth.signIn();
+                    return auth.currentUser.get().getAuthResponse(true).access_token;
+                }
+                const openPicker = (view, f) => new Promise(async resolve => new google.picker.PickerBuilder()
                     .setAppId('707865395504')
-                    .setOAuthToken(getAccessToken())
+                    .setOAuthToken(await getAccessToken())
                     .setLocale('ja')
                     .addView(view)
                     .setCallback(data => {
@@ -67,7 +70,7 @@
                         const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
                         return [action, action === 'open' ? `https://www.googleapis.com/drive/v3/files/${ids[0]}?alt=media` : folderId];
                     },
-                    getAccessToken: () => auth.currentUser.get().getAuthResponse(true).access_token,
+                    getAccessToken: getAccessToken,
                     openFile: () => openPicker(
                         new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true),
                         id => `?state=${encodeURIComponent(JSON.stringify({action: 'open', ids: [id]}))}`
