@@ -12,28 +12,22 @@
     <script>
         let resolveGAPI;
         const GAPI = new Promise(resolve => resolveGAPI = resolve);
-        window.parseState = async () => (await GAPI).parseState();
-        window.getAccessToken = async () => (await GAPI).getAccessToken();
-        window.openFile = async () => (await GAPI).openFile();
-        window.pickFile = async () => (await GAPI).pickFile();
-        window.pickFolder = async () => (await GAPI).pickFolder();
-        /*resolveGAPI({
+        window.GAPI = () => GAPI;
+        resolveGAPI({
+            getAccessToken: () => null,
             parseState: () => {
                 const state = new URLSearchParams(location.search).get('state');
                 if (!state) return null;
                 const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
                 return [action, action === 'open' ? ids[0] : folderId];
             },
-            getAccessToken: () => null,
-            openFile: () => new Promise(async resolve => {
-                const url = prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho');
-                resolve(url ? `?state=${encodeURIComponent(JSON.stringify({
-                    action: 'open',
-                    ids: [url]
-                }))}` : null);
-            }),
-            pickFile: () => new Promise(async resolve => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/kuiko.sekkeisho')))
-        });*/
+            buildState: id => `?state=${encodeURIComponent(JSON.stringify({ids: [id], action: 'open'}))}`,
+            downloadUri: id => id,
+            createUri: () => 'http://localhost:5000',
+            updateUri: id => id,
+            pickFile: () => new Promise(async resolve => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho'))),
+            pickFolder: () => new Promise(async resolve => resolve(prompt('フォルダの URL を入力してください。', 'http://localhost:5000/')))
+        });
         function loadGAPI() {
             gapi.load('client:auth2:picker', async () => {
                 await gapi.client.init({
@@ -46,7 +40,7 @@
                     if (!auth.isSignedIn.get()) await auth.signIn();
                     return auth.currentUser.get().getAuthResponse(true).access_token;
                 }
-                const openPicker = (view, f) => new Promise(async resolve => new google.picker.PickerBuilder()
+                const openPicker = view => new Promise(async resolve => new google.picker.PickerBuilder()
                     .setAppId('707865395504')
                     .setOAuthToken(await getAccessToken())
                     .setLocale('ja')
@@ -57,32 +51,26 @@
                                 resolve(null);
                                 break;
                             case google.picker.Action.PICKED:
-                                resolve(f(data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID]));
+                                resolve(data[google.picker.Response.DOCUMENTS][0][google.picker.Document.ID]);
                                 break;
                         }
                     })
                     .build().setVisible(true)
                 );
                 resolveGAPI({
+                    getAccessToken: getAccessToken,
                     parseState: () => {
                         const state = new URLSearchParams(location.search).get('state');
                         if (!state) return null;
                         const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
                         return [action, action === 'open' ? `https://www.googleapis.com/drive/v3/files/${ids[0]}?alt=media` : folderId];
                     },
-                    getAccessToken: getAccessToken,
-                    openFile: () => openPicker(
-                        new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true),
-                        id => `?state=${encodeURIComponent(JSON.stringify({action: 'open', ids: [id]}))}`
-                    ),
-                    pickFile: () => openPicker(
-                        new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true),
-                        id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media`
-                    ),
-                    pickFolder: () => openPicker(
-                        new google.picker.DocsView(google.picker.ViewId.FOLDERS).setSelectFolderEnabled(true),
-                        id => id
-                    )
+                    buildState: id => `?state=${encodeURIComponent(JSON.stringify({ids: [id], action: 'open'}))}`,
+                    downloadUri: id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media`,
+                    createUri: () => `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`,
+                    updateUri: id => `https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media`,
+                    pickFile: () => openPicker(new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true)),
+                    pickFolder: () => openPicker(new google.picker.DocsView(google.picker.ViewId.FOLDERS).setSelectFolderEnabled(true))
                 });
             });
         }
