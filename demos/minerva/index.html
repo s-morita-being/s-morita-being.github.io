@@ -13,7 +13,7 @@
         let resolveGAPI;
         const GAPI = new Promise(resolve => resolveGAPI = resolve);
         window.GAPI = () => GAPI;
-        resolveGAPI({
+        /*resolveGAPI({
             getAccessToken: () => null,
             parseState: () => {
                 const state = new URLSearchParams(location.search).get('state');
@@ -27,7 +27,7 @@
             updateUri: id => id,
             pickFile: () => new Promise(async resolve => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho'))),
             pickFolder: () => new Promise(async resolve => resolve(prompt('フォルダの URL を入力してください。', 'http://localhost:5000/')))
-        });
+        });*/
         function loadGAPI() {
             gapi.load('client:auth2:picker', async () => {
                 await gapi.client.init({
