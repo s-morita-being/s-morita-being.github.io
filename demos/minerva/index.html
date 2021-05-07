@@ -21,8 +21,7 @@
                     const {action, folderId, ids} = JSON.parse(decodeURIComponent(state));
                     return [action, action === 'open' ? ids[0] : folderId];
                 },
-                buildState: id => `?state=${encodeURIComponent(JSON.stringify({ids: [id], action: 'open'}))}`,
-                enterName: value => prompt('名前を変更', value)
+                buildState: id => `?state=${encodeURIComponent(JSON.stringify({ids: [id], action: 'open'}))}`
             };
             gapi.load('client:auth2:picker', async () => {
                 try {
@@ -55,25 +54,28 @@
                     );
                     resolveGAPI(Object.assign(module, {
                         getAccessToken: getAccessToken,
+                        getName: async id => (await gapi.client.drive.files.get({fileId: id})).result.name.replace(/\.sekkeisho$/, ''),
                         downloadUri: id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media`,
                         createUri: () => `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`,
                         updateUri: id => `https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media`,
                         pickFile: () => openPicker(new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true)),
                         pickFolder: () => openPicker(new google.picker.DocsView(google.picker.ViewId.FOLDERS).setSelectFolderEnabled(true)),
-                        rename: async id => {
-                            const name0 = (await gapi.client.drive.files.get({fileId: id})).result.name;
-                            const name1 = prompt('名前を変更', name0.replace(/\.sekkeisho$/, ''));
-                            if (name1) await gapi.client.drive.files.update({fileId: id}, {name: `${name1}.sekkeisho`});
+                        rename: async (id, name) => {
+                            const newName = prompt('名前を変更', name);
+                            if (newName) await gapi.client.drive.files.update({fileId: id}, {name: `${newName}.sekkeisho`});
+                            return newName;
                         }
                     }));
                 } catch {
                     resolveGAPI(Object.assign(module, {
                         getAccessToken: () => null,
+                        getName: async id => id,
                         downloadUri: id => id,
                         createUri: () => 'http://localhost:5000',
                         updateUri: id => id,
-                        pickFile: () => new Promise(async resolve => resolve(prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho'))),
-                        pickFolder: () => new Promise(async resolve => resolve(prompt('フォルダの URL を入力してください。', 'http://localhost:5000/')))
+                        pickFile: async () => prompt('設計書の URL を入力してください。', 'http://localhost:5000/sample.sekkeisho'),
+                        pickFolder: async () => prompt('フォルダの URL を入力してください。', 'http://localhost:5000/'),
+                        rename: async (id, name) => prompt('名前を変更', name)
                     }));
                 }
             });
