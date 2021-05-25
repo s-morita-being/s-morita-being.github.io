@@ -1,0 +1,354 @@
+{
+  "text": "マインドマップエディタをつくる。",
+  "nextID": 59,
+  "left": {
+    "items": [
+      {
+        "text": "実装",
+        "id": 23,
+        "marginY": 216.95673571103242,
+        "children": {
+          "items": [
+            {
+              "text": "ECMAScript",
+              "id": 24
+            },
+            {
+              "text": "Node.js",
+              "id": 49
+            },
+            {
+              "text": "React Hooks",
+              "id": 25
+            },
+            {
+              "text": "Create React App",
+              "id": 33
+            },
+            {
+              "text": "RxJS",
+              "id": 34
+            },
+            {
+              "text": "Jest",
+              "id": 48
+            },
+            {
+              "text": "AWS",
+              "id": 50,
+              "children": {
+                "items": [
+                  {
+                    "text": "CodeCommit",
+                    "id": 51
+                  },
+                  {
+                    "text": "Amplify",
+                    "id": 52
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "text": "mmmm って? (^^;)",
+        "id": 43,
+        "marginX": 184.73543832820584,
+        "marginY": 433.91347142206484,
+        "children": {
+          "items": [
+            {
+              "text": "Morita's",
+              "id": 44
+            },
+            {
+              "text": "Minimal",
+              "id": 45
+            },
+            {
+              "text": "Mind",
+              "id": 46
+            },
+            {
+              "text": "Map",
+              "id": 47
+            }
+          ],
+          "collapsed": true
+        }
+      }
+    ],
+    "collapsed": true
+  },
+  "right": {
+    "items": [
+      {
+        "text": "アーキテクチャ",
+        "id": 0,
+        "marginX": 31.778695686680535,
+        "marginY": 39.723369608350666,
+        "children": {
+          "items": [
+            {
+              "text": "課題",
+              "id": 2,
+              "children": {
+                "items": [
+                  {
+                    "text": "複雑さ",
+                    "id": 3
+                  },
+                  {
+                    "text": "変化",
+                    "id": 4
+                  }
+                ]
+              }
+            },
+            {
+              "text": "重大テーマ",
+              "id": 5,
+              "children": {
+                "items": [
+                  {
+                    "text": "拡張性",
+                    "id": 6
+                  },
+                  {
+                    "text": "柔軟性",
+                    "id": 7
+                  },
+                  {
+                    "text": "スケーラビリティ",
+                    "id": 8
+                  }
+                ]
+              }
+            },
+            {
+              "text": "基本アプローチ",
+              "id": 9,
+              "children": {
+                "items": [
+                  {
+                    "text": "関心事の分離",
+                    "id": 10
+                  },
+                  {
+                    "text": "SOLID",
+                    "id": 11
+                  }
+                ]
+              }
+            },
+            {
+              "text": "候補",
+              "id": 12,
+              "children": {
+                "items": [
+                  {
+                    "text": "モデルビューコントローラ",
+                    "id": 13
+                  },
+                  {
+                    "text": "ドキュメントビュー",
+                    "id": 1,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "当初",
+                          "id": 15
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "text": "モデルビュービューモデル",
+                    "id": 53,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "最終",
+                          "id": 54
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "collapsed": true
+        }
+      },
+      {
+        "text": "モデル",
+        "id": 14,
+        "marginX": 92.05109829242966,
+        "marginY": 89.98012711284824,
+        "children": {
+          "items": [
+            {
+              "text": "要件",
+              "id": 26,
+              "marginX": 63.55739137336106,
+              "marginY": 9.533608706004157,
+              "children": {
+                "items": [
+                  {
+                    "text": "簡潔な操作",
+                    "id": 27
+                  },
+                  {
+                    "text": "元に戻す/やり直しと統合",
+                    "id": 29
+                  }
+                ]
+              }
+            },
+            {
+              "text": "責務",
+              "id": 28,
+              "marginX": 50.84591309868884,
+              "marginY": 108.04756533471381,
+              "children": {
+                "items": [
+                  {
+                    "text": "元に戻す/やり直し",
+                    "id": 16,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "トランザクション処理をモチーフ",
+                          "id": 30
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "text": "モデル操作",
+                    "id": 17,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "Microsoft Office や HTML の DOM と類似",
+                          "id": 32
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "text": "読み込み/保存",
+                    "id": 18,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "JSON 互換オブジェクトを入出力",
+                          "id": 31
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "text": "ビュー",
+        "id": 19,
+        "marginX": 34.95656525534858,
+        "marginY": 84.80269916389466,
+        "children": {
+          "items": [
+            {
+              "text": "レイアウト",
+              "id": 20,
+              "children": {
+                "items": [
+                  {
+                    "text": "モデルのツリー構造と相似な React コンポーネント",
+                    "id": 35
+                  },
+                  {
+                    "text": "イミュータブル",
+                    "id": 36
+                  },
+                  {
+                    "text": "選択モデルを統合",
+                    "id": 55,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "現在の操作対象",
+                          "id": 56
+                        },
+                        {
+                          "text": "アンカー",
+                          "id": 57
+                        },
+                        {
+                          "text": "選択対象",
+                          "id": 58
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "collapsed": true
+              }
+            },
+            {
+              "text": "モデルとの同期",
+              "id": 21,
+              "children": {
+                "items": [
+                  {
+                    "text": "要件",
+                    "id": 37,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "モデルの変更を漏れなく反映",
+                          "id": 38
+                        },
+                        {
+                          "text": "変更が多くても重くならない",
+                          "id": 39
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "text": "方式",
+                    "id": 40,
+                    "children": {
+                      "items": [
+                        {
+                          "text": "トランザクション中の変更に該当する範囲を無効化",
+                          "id": 41
+                        },
+                        {
+                          "text": "トランザクション完了時に無効化された範囲を再計算",
+                          "id": 42
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "collapsed": true
+              }
+            },
+            {
+              "text": "ユーザー操作の処理",
+              "id": 22
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
